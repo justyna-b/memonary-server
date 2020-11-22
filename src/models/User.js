@@ -57,22 +57,6 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-userSchema.post('save', function (error, doc, next) {
-  const user = this
-  if (error.name === 'MongoError' && error.code === 11000) {
-    if (error.keyValue.username === user.username) {
-      console.log('This username is taken')
-      next(new Error('Taki użytkownik już istnieje'))
-    } else if (error.keyValue.email === user.email) {
-      console.log('There exists an account with that email')
-      next(new Error('Taki email już istnieje'))
-    }
-  } else {
-    console.log('Something else went wrong')
-    next(error)
-  }
-})
-
 const User = mongoose.model('User', userSchema)
 
 module.exports = User
