@@ -48,14 +48,29 @@ const userSchema = new mongoose.Schema({
   }
 })
 
+//hash the plain text pasword before save to db
 userSchema.pre('save', async function (next) {
   const user = this
-  console.log('just before saving')
   if (user.isModified('password')) {
-    user.password = await bcrypt.hash('password', 8)
+    user.password = await bcrypt.hash(user.password, 8)
+    console.log('hashed bef save', user.password)
   }
   next()
 })
+
+userSchema.statics.findByCredentials = async (email, givenPwd) => {
+  const user = await User.findOne({ email })
+  if (!user) {
+    throw new Error('Błędny email. Nie ma takiego użytkownika.')
+  }
+  console.log(user.password)
+  const isMatch = await bcrypt.compare(givenPwd, user.password)
+  console.log(isMatch)
+  if (!isMatch) {
+    throw new Error('bad credentials')
+  }
+  return user
+}
 
 const User = mongoose.model('User', userSchema)
 

@@ -10,13 +10,27 @@ app.use(express.json())
 
 const errorSaveHandler = async (res, error) => {
   let answer = ''
-  if (error.keyValue.username) {
-    answer = `Nazwa użytkownika ${error.keyValue.username} jest już zajęta`
+  if (error.errors) {
+      console.log(error)
+      res.status(400).send(error.message)
+  } else if (error.keyValue.username) {
+      res.status(400).send(`Nazwa użytkownika: ${error.keyValue.username} jest już zajęta`)
   } else if (error.keyValue.email) {
-    answer = `Email  ${error.keyValue.email} jest już zajęty`
+      res.status(400).send(`Istnieje już konto na adres: ${error.keyValue.email}`)
+  } else {
+      res.status(400).send(error)
   }
-  res.status(400).send(answer)
 }
+
+app.post('/users/login', async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        res.send(user)
+    } catch (error) {
+        console.log(error)
+        res.status(403).send(error)
+    }
+})
 
 app.post('/users', async (req, res) => {
   const user = new User(req.body)
@@ -24,7 +38,6 @@ app.post('/users', async (req, res) => {
     await user.save()
     res.send(user)
   } catch (error) {
-    console.log('cos jest')
     errorSaveHandler(res, error)
   }
 })
