@@ -40,6 +40,33 @@ router.post('/users', async (req, res) => {
   }
 })
 
+//logout bieżąca sesja
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            //return true when the token that you're currently looking at isn't the one that was used for authentication, while true keep in tokens array if false stop filtering and remove
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.status(200).send()
+
+    } catch (error) {
+        res.status(500).send()
+    }
+})
+
+//logout of all sessions
+router.post('/users/logout-all', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.status(200).send()
+
+    } catch (error) {
+        res.status(500).send()
+    }
+})
+
 router.get('/get-all', async (req, res) => {
     try {
         const users = await User.find({})

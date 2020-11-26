@@ -15,6 +15,7 @@ const auth = async (req, res, next) => {
         //if success, give root handler access to the fetched from the db user
         //it is fetched so root handler does not have to do that again it waste resource and time
         //add the property onto request to store it and the root handler will be able to access it later on
+        req.token = token
         req.user = user
         console.log("token token: " ,token, decoded)
         next()
