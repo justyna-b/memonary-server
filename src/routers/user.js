@@ -22,7 +22,6 @@ router.post('/users/login', async (req, res) => {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
         res.send({user, token})
-        res.send(user)
     } catch (error) {
         console.log(error)
         res.status(403).send(error)
@@ -40,7 +39,7 @@ router.post('/users', async (req, res) => {
   }
 })
 
-//logout bieżąca sesja
+//logout current session
 router.post('/users/logout', auth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter((token) => {
@@ -80,7 +79,7 @@ router.get('/get/me', auth, async (req, res) => {
     try {
         res.send(req.user)
     } catch (error) {
-        res.status(403).send("you are not authenticated")
+        res.status(403).send('you are not authenticated')
     }
 })
 
