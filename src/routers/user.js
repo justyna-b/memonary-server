@@ -7,16 +7,18 @@ const cors = require('cors')
 const errorSaveHandler = (res, error) => {
   let answer = ''
   if (error.errors) {
-    console.log(error)
+    if (error.errors.password){
+      res.status(400).send({msg : 'Twoje hasło jest krótsze niż 8 znaków'})
+    }
     res.status(400).send(error.message)
   } else if (error.keyValue.username) {
     res
       .status(400)
-      .send(`Nazwa użytkownika: ${error.keyValue.username} jest już zajęta`)
+      .send({msg : `Nazwa użytkownika: ${error.keyValue.username} jest już zajęta`})
   } else if (error.keyValue.email) {
-    res.status(400).send(`Istnieje już konto na adres: ${error.keyValue.email}`)
+    res.status(400).send({msg :`Istnieje już konto na adres: ${error.keyValue.email}`})
   } else {
-    res.status(400).send(error)
+    res.status(400).send({error : error.errors, msg: 'Rejestracja się nie powiodła. Spróbuj jeszcze raz'})
   }
 }
 
@@ -39,13 +41,7 @@ router.post('/users', async (req, res) => {
       .status(201)
       .send({ user: user, msg: 'Zostałeś zarejestrowany. Zaloguj się' })
   } catch (error) {
-    res
-      .status(403)
-      .send({
-        error: error,
-        msg: 'Rejestracja się nie powiodła. Spróbuj jeszcze raz'
-      })
-    // errorSaveHandler(res, error)
+    res.status(403).send(errorSaveHandler(res, error))
   }
 })
 
