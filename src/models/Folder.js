@@ -13,12 +13,12 @@ const folderSchema = new mongoose.Schema({
   },
   words: [
     {
-      pl_word: {
+      definition: {
         type: String,
         required: true,
         trim: true
       },
-      foreign_word: {
+      translation: {
         type: String,
         required: true,
         trim: true
